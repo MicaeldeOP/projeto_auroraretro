@@ -105,14 +105,6 @@
                                 ARCADE - NEOGEO
                               </a>
                             </li>
-
-                            
-
-                            <li class="nav-item ">
-                              <a class="nav-link" href="#" role="button" aria-expanded="false">
-                                MSX
-                              </a>
-                            </li>
                             
 
                             <li class="nav-item ">
@@ -140,7 +132,7 @@
               <script type="text/javascript">
                 EJS_player = '#game'; //nao remova isso
                 EJS_biosUrl = 'bios/3do/panafz10.7z'; // Arquivo de BIOS os unicos que precisam são 3do, arcade, msx, nes, pce, psx, segacd, segagg
-                EJS_gameUrl = 'rom/3do/wolfenstein-fz.7z'; // Url to Game rom
+                EJS_gameUrl = 'rom/3do/wolfenstein-fz.7z'; // Url da  rom (jogo)
                 EJS_core = '3do'; //troque aqui o sistema que voce quer sendo eles todos os emuladores compativeis com o jogo
                 EJS_pathtodata = 'data/';
               </script>
@@ -151,7 +143,7 @@
 
 
          
-        <footer class="footer" style="margin-top: 30vw;">
+        <footer class="footer position-relative" style="margin-top: 40vw;">
         <div id="sintese">
           <p><img id="folhinha" src="img/folha.png" alt="fôinhaaa!" style="margin-right: 3vw;">Esse projeto foi elaborado visando alguns intuitos tais como sustentabilidade e o entretenimento.</p>
           <p>Segue link do criador dos codigos de emuladores que usamos: <b>https://github.com/ethanaobrien/emulatorjs<b><p></p>
