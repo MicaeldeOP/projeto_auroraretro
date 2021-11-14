@@ -4,7 +4,7 @@
 [I'm an inline-style link] https://github.com/ethanaobrien/emulatorjs
 
 <H1>Você vai precisar de um web server para que funcione</H1>
-<p>Foi colocado o Tomcat para que funcionasse, há um tutorial de como fazer em Tomcat/Guia.</p>
+<p>Foi colocado o Tomcat para que funcionasse, há um tutorial de como fazer em /guia-tomcat. Tanto para Ubuntu 20.04 quanto para Windows</p>
 
 <H1>Se quiser adicionar um emulador</H1> 
 <p>Verifique se o sistema está em emulatorjs.com. Se não, então, peça para que seja adicionado o sistema que você gostaria de emular.</p>
