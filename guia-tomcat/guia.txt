@@ -1,0 +1,295 @@
+INSTALANDO O TOMCAT 10 NO UBUNTU 20.04/WINDOWS
+
+UBUNTU 20.04
+------------------------------------------------------------------------------------------------------------------------------
+Passo 1 — Instalar o Java
+
+O Tomcat exige que o Java esteja instalado no servidor para que qualquer código de aplicativo Web do Java possa ser executado. 
+Podemos atender esse requisito instalando o OpenJDK com o apt.
+
+Primeiramente, atualize seu índice de pacotes da ferramenta apt:
+
+    sudo apt update
+
+ 
+
+Então, instale o pacote Java Development Kit com a apt:
+
+    sudo apt install default-jdk
+
+ 
+
+Agora que o Java está instalado, podemos criar um usuário tomcat, que será usado para executar o serviço do Tomcat.
+
+
+Passo 2 — Criar o usuário do Tomcat
+
+Para fins de segurança, o Tomcat deve ser executado como um usuário sem privilégios (ou seja, não raiz). 
+Criaremos um usuário e um grupo que executarão o serviço Tomcat.
+
+Primeiro, crie um grupo tomcat:
+
+    sudo groupadd tomcat
+
+ 
+
+Em seguida, crie um usuário tomcat. Tornaremos esse usuário um membro do grupo tomcat, 
+com um diretório home de /opt/tomcat (onde vamos instalar o Tomcat) e com um shell de /bin/false (para que ninguém possa fazer login na conta):
+
+    sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+
+ 
+
+Agora que nosso usuário tomcat está configurado, vamos baixar e instalar o Tomcat.
+
+
+Passo 3 — Instalar o Tomcat
+
+A melhor maneira de instalar o Tomcat 10 é baixando a última versão binária e, depois, configurá-la manualmente.
+
+Em seguida, mude para o diretório /tmp, em seu servidor. Este é um bom diretório para baixar itens transitórios, como o Tomcat tarball,
+dos quais não iremos precisar depois que extrairmos o conteúdo do Tomcat:
+
+    cd /tmp
+
+ 
+
+Use o curl para baixar o link que copiou do site do Tomcat:
+
+    curl -O https://dlcdn.apache.org/tomcat/tomcat-10/v10.0.12/bin/apache-tomcat-10.0.12.tar.gz
+
+ 
+
+Vamos instalar o Tomcat no diretório /opt/tomcat. Crie o diretório e, em seguida, extraia o arquivo nele com esses comandos:
+
+    sudo mkdir /opt/tomcat
+    sudo tar xzvf apache-tomcat-*tar.gz -C /opt/tomcat --strip-components=1
+
+ 
+
+Na sequência, podemos configurar as permissões de usuário apropriadas para a nossa instalação.
+
+
+
+Passo 4 — Atualizar permissões
+
+O usuário tomcat que configuramos precisa ter acesso à instalação do Tomcat. Agora, vamos configurar isso.
+
+Vá até o diretório onde extraímos a instalação do Tomcat:
+
+    cd /opt/tomcat
+
+ 
+
+Dê a propriedade de todo o diretório de instalação ao grupo tomcat:
+
+    sudo chgrp -R tomcat /opt/tomcat
+
+ 
+
+Em seguida, dê ao grupo tomcat acesso de leitura ao diretório conf e todo o seu conteúdo e execute o acesso ao diretório, propriamente dito:
+
+    sudo chmod -R g+r conf
+    sudo chmod g+x conf
+
+ 
+
+Faça do usuário tomcat o proprietário dos diretórios webapps, work, temp e logs:
+
+    sudo chown -R tomcat webapps/ work/ temp/ logs/
+
+ 
+
+Agora que as permissões apropriadas estão configuradas, podemos criar um arquivo de serviço systemd para gerenciar o processo do Tomcat.
+
+
+
+Passo 5 — Criar um arquivo de serviço systemd
+
+Queremos executar o Tomcat como um serviço. Dessa forma, vamos configurar o arquivo de serviço systemd.
+
+O Tomcat precisa saber onde o Java está instalado. Normalmente, esse caminho é chamado de “JAVA_HOME”. A maneira mais fácil de procurar esse local é executando este comando:
+
+    sudo update-java-alternatives -l
+
+ 
+
+Deve sair algo parecido com essa mensagem:
+    java-1.11.0-openjdk-amd64       1081       /usr/lib/jvm/java-1.11.0-openjdk-amd64
+
+Seu JAVA_HOME é o resultado da última coluna (destacada em vermelho). Considerando o exemplo acima, o JAVA_HOME correto para este servidor seria:
+
+JAVA_HOME
+/usr/lib/jvm/java-1.11.0-openjdk-amd64
+
+Seu JAVA_HOME pode ser diferente.
+
+Com essa informação, podemos criar o arquivo de serviço systemd. Abra um arquivo chamado tomcat.service no diretório /etc/systemd/system, digitando:
+
+    sudo nano /etc/systemd/system/tomcat.service
+
+ 
+
+Cole o conteúdo a seguir no seu arquivo de serviço. Modifique o valor de JAVA_HOME se necessário para que corresponda ao valor que você encontrou no seu sistema.
+Você também pode desejar modificar as configurações de alocação de memória que estão especificadas em CATALINA_OPTS:
+
+/etc/systemd/system/tomcat.service
+
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+User=tomcat
+Group=tomcat
+UMask=0007
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+ 
+
+Quando você terminar, salve e feche o arquivo.
+
+Em seguida, recarregue o daemon systemd para que ele saiba sobre nosso arquivo de serviço:
+
+    sudo systemctl daemon-reload
+
+ 
+
+Inicie o serviço Tomcat digitando:
+
+    sudo systemctl start tomcat
+
+ 
+
+Verifique novamente se ele foi iniciado sem erros, digitando:
+
+    sudo systemctl status tomcat
+
+
+ 
+Passo 6 — Ajustar o firewall e testar o servidor do Tomcat
+
+Agora que o serviço Tomcat foi iniciado, podemos testá-lo para garantir que a página padrão esteja disponível.
+
+Antes de fazer isso, precisamos ajustar o firewall para permitir que nossos pedidos cheguem ao serviço. Se seguiu os pré-requisitos, você terá um firewall ufw habilitado.
+
+O Tomcat usa a porta 8080 para aceitar pedidos convencionais. Permita o tráfego naquela porta, digitando:
+
+    sudo ufw allow 8080
+
+ 
+
+Com o firewall modificado, é possível acessar a página inicial padrão, indo ao seu domínio ou endereço IP, seguido de :8080 em um navegador Web:
+
+Abra no seu Web Browser
+http://127.0.0.1:8080
+
+Você verá a página inicial padrão do Tomcat, além de outras informações. No entanto, caso clique nos links para o Manager App, por exemplo, seu acesso será negado.
+Podemos configurar esse acesso a seguir.
+
+Se você conseguiu acessar o Tomcat com sucesso, agora é um bom momento para habilitar o arquivo de serviço, de modo a fazer o Tomcat iniciar automaticamente na inicialização:
+
+    sudo systemctl enable tomcat
+
+ 
+
+
+Passo 7 — Configurar a interface de gerenciamento Web do Tomcat
+
+Para usar o app gerenciador Web que vem com o Tomcat, precisamos adicionar um login ao nosso servidor Tomcat. Faremos isso editando o arquivo tomcat-users.xml:
+
+    sudo nano /opt/tomcat/conf/tomcat-users.xml
+
+ 
+
+Será adicionado um usuário que pode acessar o manager-gui e admin-gui (apps Web que vêm com o Tomcat). Você pode fazer isso, definindo um usuário, como no exemplo abaixo,
+entre os sinalizadores tomcat-users. Certifique-se de alterar o nome de usuário e senha para algo seguro:
+
+tomcat-users.xml — Admin User
+
+<tomcat-users . . .>
+    <user username="admin" password="password" roles="manager-gui,admin-gui"/>
+</tomcat-users>
+
+ 
+
+Salve e feche o arquivo quando você terminar.
+
+Por padrão, as versões mais recentes do Tomcat restringem o acesso aos aplicativos Manager e Host Manager para conexões vindas do servidor, propriamente dito. 
+Como estamos instalando em uma máquina remota, você provavelmente vai querer remover ou alterar essa restrição. Para alterar as restrições de endereço IP neles, 
+abra os arquivos context.xml apropriados.
+
+Para o app Manager, digite:
+
+    sudo nano /opt/tomcat/webapps/manager/META-INF/context.xml
+
+ 
+
+Para o app Host Manager, digite:
+
+    sudo nano /opt/tomcat/webapps/host-manager/META-INF/context.xml
+
+ 
+
+Lá dentro, retire o comentário da restrição de endereço IP para permitir conexões de qualquer lugar. Como alternativa, 
+caso queira permitir o acesso apenas às conexões vindas do seu próprio endereço IP, adicione seu endereço IP público na lista:
+
+context.xml files for Tomcat webapps
+
+<Context antiResourceLocking="false" privileged="true" >
+  <!--<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />-->
+</Context>
+
+ 
+
+Salve e feche os arquivos quando você terminar.
+
+Para que nossas alterações entre em vigor, reinicie o serviço Tomcat:
+
+    sudo systemctl restart tomcat
+
+ 
+Passo 8 — Acessar a interface Web
+
+Agora que criamos um usuário, podemos acessar a interface Web novamente, em um navegador Web. Novamente, você poderá chegar à interface correta, 
+digitando o nome de domínio ou endereço IP do seu servidor, seguido da porta 8080 no seu navegador:
+
+Abra no seu Web Browser
+http://127.0.0.1:8080
+
+
+E você deve ver agora a pagina com incial do tomcat.
+
+FIM
+
+
+------------------------------------------------------------------------------------------------------------------------------
+WINDOWS
+------------------------------------------------------------------------------------------------------------------------------
+
+Coloque no Browser o seguinte link:
+
+https://dlcdn.apache.org/tomcat/tomcat-10/v10.0.12/bin/apache-tomcat-10.0.12.exe
+
+Salve e inice o instalador, aceite os termos e clique proximo até acabar.
+
+Pronto é só isso.
+
+
