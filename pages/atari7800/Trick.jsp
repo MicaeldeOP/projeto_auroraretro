@@ -115,7 +115,7 @@
             
               <script type="text/javascript">
                 EJS_player = '#game'; //NÂO remova isso
-                EJS_gameUrl = 'https://archive.org/download/Atari7800SpecialCollection/Atari-7800.7z/Ace%20of%20Aces%20%281988%29%20%28Atari%29.a78'; // AQUI mude o jogo aqui, Url da  rom (jogo)
+                EJS_gameUrl = 'https://archive.org/download/Atari7800SpecialCollection/Atari-7800.7z/Trick%20%281987%29%20%28Atari%29.a78'; // AQUI mude o jogo aqui, Url da  rom (jogo)
                 EJS_core = 'atari7800'; // NÂO troque nada aqui
                 EJS_pathtodata = '/auroraretro/data/';
               </script>

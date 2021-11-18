@@ -115,9 +115,9 @@
             
               <script type="text/javascript">
                 EJS_player = '#game'; //NÂO remova isso
-                EJS_gameUrl = 'https://archive.org/download/Atari7800SpecialCollection/Atari-7800.7z/Ace%20of%20Aces%20%281988%29%20%28Atari%29.a78'; // AQUI mude o jogo aqui, Url da  rom (jogo)
-                EJS_core = 'atari7800'; // NÂO troque nada aqui
-                EJS_pathtodata = '/auroraretro/data/';
+                EJS_gameUrl = 'https://archive.org/download/atarijaguarj6420190518213240/Atari%20-%20Jaguar%20%28ROM%29%20%2820190518-213240%29.zip/Club%20Drive%20%28World%29.zip'; // AQUI mude o jogo aqui, Url da  rom (jogo)
+                EJS_core = 'jaguar'; // NÂO troque nada aqui
+                EJS_pathtodata = '/auroraretro/data/'; 
               </script>
               <script src="/auroraretro/data/loader.js"></script>
               
@@ -133,5 +133,6 @@
       </body>
 
 </html>
+
 
 
