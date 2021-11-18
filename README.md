@@ -1,4 +1,4 @@
-# Projeto Aurora - SENAC
+# Projeto AuroraRetro - SENAC
 <p>Um site de emulação de jogos de consoles antigos com emuladores e decriptadores, nós não temos as roms apenas pegamos de links externos.</p>
 <p>Um grande agradecimento a Ethan O'Brien que criou os modificou os emuladores e decriptadores para que funcionasse sem os anuncios.</p> 
 [I'm an inline-style link] https://github.com/ethanaobrien/emulatorjs
